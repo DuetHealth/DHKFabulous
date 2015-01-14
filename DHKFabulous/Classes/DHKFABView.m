@@ -59,11 +59,14 @@
     [self addConstraints:buttonHorizontalConstraints];
     
     // my constraints
-    NSArray *fabVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[self(height)]|" options:0 metrics:metrics views:views];
+    NSArray *fabVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[self]|" options:0 metrics:metrics views:views];
     NSArray *fabHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self]|" options:0 metrics:metrics views:views];
     
     [self.superview addConstraints:fabVerticalConstraints];
     [self.superview addConstraints:fabHorizontalConstraints];
+    
+    _heightConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:54.0];
+    [self addConstraint:_heightConstraint];
 }
 
 - (void)buttonPressed:(UIButton*)button {
@@ -73,8 +76,29 @@
 
 - (void)toggleFAB {
     _expanded = !_expanded;
-
     
+    if (_expanded) {
+        
+        [self removeConstraint:_heightConstraint];
+        
+        if (!_topConstraint) {
+            _topConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.superview attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
+        }
+        [self.superview addConstraint:_topConstraint];
+        
+
+    } else {
+        [self.superview removeConstraint:_topConstraint];
+        [self addConstraint:_heightConstraint];
+
+    }
+    
+    [UIView animateWithDuration:0.09 animations:^{
+        [self.superview setNeedsLayout];
+        [self.superview layoutIfNeeded];
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    }];
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
