@@ -7,8 +7,11 @@
 //
 
 #import "ViewController.h"
+#import "DHKFABView.h"
 
 @interface ViewController ()
+
+@property (strong, nonatomic) DHKFABView* fab;
 
 @end
 
@@ -16,12 +19,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    
+    _fab = [DHKFABView dhk_FABWithSuperview:self.view andItems:@[]];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 @end

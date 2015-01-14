@@ -14,6 +14,9 @@
 		1EF8AF031A66FD1C0031D1EF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EF8AF021A66FD1C0031D1EF /* Images.xcassets */; };
 		1EF8AF061A66FD1C0031D1EF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1EF8AF041A66FD1C0031D1EF /* LaunchScreen.xib */; };
 		1EF8AF121A66FD1C0031D1EF /* DHKFabulousTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF111A66FD1C0031D1EF /* DHKFabulousTests.m */; };
+		1EF8AF1F1A6701C00031D1EF /* DHKFABView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF1E1A6701C00031D1EF /* DHKFABView.m */; };
+		1EF8AF221A6701EF0031D1EF /* DHKFABItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF211A6701EF0031D1EF /* DHKFABItem.m */; };
+		1EF8AF251A6703FC0031D1EF /* DHKFABLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +43,12 @@
 		1EF8AF0B1A66FD1C0031D1EF /* DHKFabulousTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DHKFabulousTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EF8AF101A66FD1C0031D1EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1EF8AF111A66FD1C0031D1EF /* DHKFabulousTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DHKFabulousTests.m; sourceTree = "<group>"; };
+		1EF8AF1D1A6701C00031D1EF /* DHKFABView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DHKFABView.h; sourceTree = "<group>"; };
+		1EF8AF1E1A6701C00031D1EF /* DHKFABView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DHKFABView.m; sourceTree = "<group>"; };
+		1EF8AF201A6701EF0031D1EF /* DHKFABItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DHKFABItem.h; sourceTree = "<group>"; };
+		1EF8AF211A6701EF0031D1EF /* DHKFABItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DHKFABItem.m; sourceTree = "<group>"; };
+		1EF8AF231A6703FC0031D1EF /* DHKFABLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DHKFABLabel.h; sourceTree = "<group>"; };
+		1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DHKFABLabel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +90,7 @@
 		1EF8AEF41A66FD1C0031D1EF /* DHKFabulous */ = {
 			isa = PBXGroup;
 			children = (
+				1EF8AF1C1A66FEAA0031D1EF /* Classes */,
 				1EF8AEF91A66FD1C0031D1EF /* AppDelegate.h */,
 				1EF8AEFA1A66FD1C0031D1EF /* AppDelegate.m */,
 				1EF8AEFC1A66FD1C0031D1EF /* ViewController.h */,
@@ -117,6 +127,19 @@
 				1EF8AF101A66FD1C0031D1EF /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1EF8AF1C1A66FEAA0031D1EF /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				1EF8AF1D1A6701C00031D1EF /* DHKFABView.h */,
+				1EF8AF1E1A6701C00031D1EF /* DHKFABView.m */,
+				1EF8AF201A6701EF0031D1EF /* DHKFABItem.h */,
+				1EF8AF211A6701EF0031D1EF /* DHKFABItem.m */,
+				1EF8AF231A6703FC0031D1EF /* DHKFABLabel.h */,
+				1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,7 +244,10 @@
 			files = (
 				1EF8AEFE1A66FD1C0031D1EF /* ViewController.m in Sources */,
 				1EF8AEFB1A66FD1C0031D1EF /* AppDelegate.m in Sources */,
+				1EF8AF1F1A6701C00031D1EF /* DHKFABView.m in Sources */,
 				1EF8AEF81A66FD1C0031D1EF /* main.m in Sources */,
+				1EF8AF251A6703FC0031D1EF /* DHKFABLabel.m in Sources */,
+				1EF8AF221A6701EF0031D1EF /* DHKFABItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
