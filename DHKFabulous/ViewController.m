@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "DHKFABView.h"
+#import "DHKFabulous.h"
 
 @interface ViewController ()
 
@@ -20,8 +20,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
-    _fab = [DHKFABView dhk_FABWithSuperview:self.view andItems:@[]];
+    DHKFABItem* item1 = [[DHKFABItem alloc] initWithTitle:@"Title 1" icon:nil andAction:^{
+        NSLog(@"item 1 pressed");
+    }];
+    DHKFABItem* item2 = [[DHKFABItem alloc] initWithTitle:@"Title 2" icon:nil andAction:^{
+        NSLog(@"item 2 pressed");
+    }];
+    DHKFABItem* item3 = [[DHKFABItem alloc] initWithTitle:@"Title 3" icon:nil andAction:^{
+        NSLog(@"item 3 pressed");
+    }];
+    DHKFABItem* item4 = [[DHKFABItem alloc] initWithTitle:@"Title 4" icon:nil andAction:^{
+        NSLog(@"item 4 pressed");
+    }];
+    _fab = [DHKFABView dhk_FABWithSuperview:self.view andItems:@[item1, item2, item3, item4]];
 }
 
 

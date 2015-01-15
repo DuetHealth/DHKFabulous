@@ -17,6 +17,10 @@
 		1EF8AF1F1A6701C00031D1EF /* DHKFABView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF1E1A6701C00031D1EF /* DHKFABView.m */; };
 		1EF8AF221A6701EF0031D1EF /* DHKFABItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF211A6701EF0031D1EF /* DHKFABItem.m */; };
 		1EF8AF251A6703FC0031D1EF /* DHKFABLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */; };
+		1EF8AF271A68077C0031D1EF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EF8AF261A68077C0031D1EF /* QuartzCore.framework */; };
+		1EF8AF291A6807800031D1EF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EF8AF281A6807800031D1EF /* UIKit.framework */; };
+		1EF8AF2B1A6807980031D1EF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EF8AF2A1A6807980031D1EF /* Foundation.framework */; };
+		1EF8AF351A680ABE0031D1EF /* DHKFABButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8AF341A680ABE0031D1EF /* DHKFABButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,12 @@
 		1EF8AF211A6701EF0031D1EF /* DHKFABItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DHKFABItem.m; sourceTree = "<group>"; };
 		1EF8AF231A6703FC0031D1EF /* DHKFABLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DHKFABLabel.h; sourceTree = "<group>"; };
 		1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DHKFABLabel.m; sourceTree = "<group>"; };
+		1EF8AF261A68077C0031D1EF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		1EF8AF281A6807800031D1EF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1EF8AF2A1A6807980031D1EF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1EF8AF331A680ABE0031D1EF /* DHKFABButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DHKFABButton.h; sourceTree = "<group>"; };
+		1EF8AF341A680ABE0031D1EF /* DHKFABButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DHKFABButton.m; sourceTree = "<group>"; };
+		1EF8AF361A6821ED0031D1EF /* DHKFabulous.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DHKFabulous.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +66,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1EF8AF2B1A6807980031D1EF /* Foundation.framework in Frameworks */,
+				1EF8AF291A6807800031D1EF /* UIKit.framework in Frameworks */,
+				1EF8AF271A68077C0031D1EF /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +85,9 @@
 		1EF8AEE91A66FD1C0031D1EF = {
 			isa = PBXGroup;
 			children = (
+				1EF8AF2A1A6807980031D1EF /* Foundation.framework */,
+				1EF8AF281A6807800031D1EF /* UIKit.framework */,
+				1EF8AF261A68077C0031D1EF /* QuartzCore.framework */,
 				1EF8AEF41A66FD1C0031D1EF /* DHKFabulous */,
 				1EF8AF0E1A66FD1C0031D1EF /* DHKFabulousTests */,
 				1EF8AEF31A66FD1C0031D1EF /* Products */,
@@ -132,14 +148,25 @@
 		1EF8AF1C1A66FEAA0031D1EF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				1EF8AF2C1A6807A50031D1EF /* UIKitSubclasses */,
 				1EF8AF1D1A6701C00031D1EF /* DHKFABView.h */,
 				1EF8AF1E1A6701C00031D1EF /* DHKFABView.m */,
 				1EF8AF201A6701EF0031D1EF /* DHKFABItem.h */,
 				1EF8AF211A6701EF0031D1EF /* DHKFABItem.m */,
-				1EF8AF231A6703FC0031D1EF /* DHKFABLabel.h */,
-				1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */,
 			);
 			path = Classes;
+			sourceTree = "<group>";
+		};
+		1EF8AF2C1A6807A50031D1EF /* UIKitSubclasses */ = {
+			isa = PBXGroup;
+			children = (
+				1EF8AF231A6703FC0031D1EF /* DHKFABLabel.h */,
+				1EF8AF241A6703FC0031D1EF /* DHKFABLabel.m */,
+				1EF8AF331A680ABE0031D1EF /* DHKFABButton.h */,
+				1EF8AF341A680ABE0031D1EF /* DHKFABButton.m */,
+				1EF8AF361A6821ED0031D1EF /* DHKFabulous.h */,
+			);
+			name = UIKitSubclasses;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,6 +270,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1EF8AEFE1A66FD1C0031D1EF /* ViewController.m in Sources */,
+				1EF8AF351A680ABE0031D1EF /* DHKFABButton.m in Sources */,
 				1EF8AEFB1A66FD1C0031D1EF /* AppDelegate.m in Sources */,
 				1EF8AF1F1A6701C00031D1EF /* DHKFABView.m in Sources */,
 				1EF8AEF81A66FD1C0031D1EF /* main.m in Sources */,

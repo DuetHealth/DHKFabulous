@@ -9,11 +9,17 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface DHKFABItem : NSObject
+@interface DHKFABItem : UIView
+
+- (instancetype)initWithAttributedTitle:(NSAttributedString*)title
+                                   icon:(UIImage*)icon
+                              andAction:(void (^)())action;
 
 - (instancetype)initWithTitle:(NSString*)title
                          icon:(UIImage*)icon
                     andAction:(void (^)())action;
+
+- (CGRect)buttonFrame;
 
 
 

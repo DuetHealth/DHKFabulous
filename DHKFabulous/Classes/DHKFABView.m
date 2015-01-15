@@ -7,11 +7,13 @@
 //
 
 #import "DHKFABView.h"
+#import "DHKFABButton.h"
+#import "DHKFABItem.h"
 
 @interface DHKFABView()
 
+@property (strong, nonatomic) DHKFABItem* baseFABItem;
 @property (strong, nonatomic) NSArray* items;
-@property (strong, nonatomic) UIButton* button;
 @property (strong, nonatomic) NSLayoutConstraint* heightConstraint;
 @property (strong, nonatomic) NSLayoutConstraint* topConstraint;
 
@@ -24,6 +26,7 @@
 + (instancetype)dhk_FABWithSuperview:(UIView*)view andItems:(NSArray*)items {
     
     DHKFABView *fab = [[DHKFABView alloc] init];
+    fab.items = items;
     [view addSubview:fab];
     
     [fab setup];
@@ -34,29 +37,31 @@
 - (void)setup {
     self.translatesAutoresizingMaskIntoConstraints = NO;
     
-    self.backgroundColor = [UIColor redColor];
+    self.backgroundColor = [UIColor clearColor];
     
-    _button = [[UIButton alloc] init];
-    _button.backgroundColor = [UIColor blueColor];
-    _button.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:_button];
-    [_button setTitle:@"+" forState:UIControlStateNormal];
-    [_button addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    __weak typeof(self) weakself = self;
+    _baseFABItem = [[DHKFABItem alloc] initWithTitle:nil icon:nil andAction:^{
+        typeof(self) strongself = weakself;
+        if (strongself) {
+            [strongself toggleFAB];
+        }
+    }];
     
-    // lots of constraints
-    NSDictionary* metrics = @{@"padding": @15,
+    _baseFABItem.alpha = 1.0;
+    [self addSubview:_baseFABItem];
+    
+    // constrains for base fab item
+    NSDictionary* metrics = @{@"padding": @16,
                               @"spacing": @5,
-                              @"square": @44,
-                              @"height": @54,
+                              @"square": @56,
+                              @"height": @88,
                               };
-    NSDictionary* views = NSDictionaryOfVariableBindings(_button, self);
+    NSDictionary* views = NSDictionaryOfVariableBindings(_baseFABItem, self);
+    NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_baseFABItem]|" options:0 metrics:metrics views:views];
+    NSArray* itemHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_baseFABItem]|" options:0 metrics:metrics views:views];
     
-    // button constraints
-    NSArray *buttonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_button(square)]-(spacing)-|" options:0 metrics:metrics views:views];
-    NSArray *buttonHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=0)-[_button(square)]-(padding)-|" options:0 metrics:metrics views:views];
-    
-    [self addConstraints:buttonVerticalConstraints];
-    [self addConstraints:buttonHorizontalConstraints];
+    [self addConstraints:itemVerticalConstraints];
+    [self addConstraints:itemHorizontalConstraints];
     
     // my constraints
     NSArray *fabVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[self]|" options:0 metrics:metrics views:views];
@@ -65,13 +70,39 @@
     [self.superview addConstraints:fabVerticalConstraints];
     [self.superview addConstraints:fabHorizontalConstraints];
     
-    _heightConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:54.0];
+    _heightConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:88.0];
     [self addConstraint:_heightConstraint];
+    
+    [self setupFABItems];
+}
+
+// this sets up constraints for fabitems
+- (void)setupFABItems {
+    DHKFABItem* previousItem = _baseFABItem;
+    for (DHKFABItem* i in _items) {
+
+        [self addSubview:i];
+        
+        // constrains for base fab item
+        NSDictionary* metrics = @{@"padding": @16,
+                                  @"spacing": @5,
+                                  @"square": @56,
+                                  @"height": @88,
+                                  };
+        NSDictionary* views = NSDictionaryOfVariableBindings(i, previousItem, self);
+        
+        NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[i(height)]-(padding)-[previousItem]" options:0 metrics:metrics views:views];
+        NSArray* itemHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[i]|" options:0 metrics:metrics views:views];
+        
+        [self addConstraints:itemVerticalConstraints];
+        [self addConstraints:itemHorizontalConstraints];
+        
+        previousItem = i;
+    }
 }
 
 - (void)buttonPressed:(UIButton*)button {
     [self toggleFAB];
-    
 }
 
 - (void)toggleFAB {
@@ -90,19 +121,32 @@
     } else {
         [self.superview removeConstraint:_topConstraint];
         [self addConstraint:_heightConstraint];
-
+        
     }
     
+    __weak typeof(self) weakself = self;
+    CGFloat alpha = _expanded ? 1.0 : 0.0;
+    UIColor* backgroundColor = _expanded ? [[UIColor lightGrayColor] colorWithAlphaComponent:0.5] : [UIColor clearColor];
+
     [UIView animateWithDuration:0.09 animations:^{
-        [self.superview setNeedsLayout];
-        [self.superview layoutIfNeeded];
-        [self setNeedsLayout];
-        [self layoutIfNeeded];
+        typeof(self) strongself = weakself;
+        if (strongself) {
+            [strongself.superview setNeedsLayout];
+            [strongself.superview layoutIfNeeded];
+            [strongself setNeedsLayout];
+            [strongself layoutIfNeeded];
+            
+            for (DHKFABItem* i in strongself.items) {
+                i.alpha = alpha;
+            }
+            
+            strongself.backgroundColor = backgroundColor;
+        }
     }];
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
-    if (_expanded || CGRectContainsPoint(_button.frame, point)) {
+    if (_expanded || CGRectContainsPoint(_baseFABItem.buttonFrame, point)) {
         return YES;
     }
     return NO;
