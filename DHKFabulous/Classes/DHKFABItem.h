@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+@class DHKFABView;
+
 @interface DHKFABItem : UIView
 
 - (instancetype)initWithAttributedTitle:(NSAttributedString*)title
@@ -20,6 +22,8 @@
                     andAction:(void (^)())action;
 
 - (CGRect)buttonFrame;
+
+- (void)setLabelHidden:(BOOL)hidden;
 
 
 

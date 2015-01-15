@@ -43,9 +43,10 @@
     _baseFABItem = [[DHKFABItem alloc] initWithTitle:nil icon:nil andAction:^{
         typeof(self) strongself = weakself;
         if (strongself) {
-            [strongself toggleFAB];
+            [strongself toggleFAB:!strongself.expanded];
         }
     }];
+    [_baseFABItem setLabelHidden:YES];
     
     _baseFABItem.alpha = 1.0;
     [self addSubview:_baseFABItem];
@@ -80,18 +81,17 @@
 - (void)setupFABItems {
     DHKFABItem* previousItem = _baseFABItem;
     for (DHKFABItem* i in _items) {
-
         [self addSubview:i];
         
         // constrains for base fab item
         NSDictionary* metrics = @{@"padding": @16,
-                                  @"spacing": @5,
+                                  @"spacing": @(-10),
                                   @"square": @56,
                                   @"height": @88,
                                   };
         NSDictionary* views = NSDictionaryOfVariableBindings(i, previousItem, self);
         
-        NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[i(height)]-(padding)-[previousItem]" options:0 metrics:metrics views:views];
+        NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[i(height)]-(spacing)-[previousItem]" options:0 metrics:metrics views:views];
         NSArray* itemHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[i]|" options:0 metrics:metrics views:views];
         
         [self addConstraints:itemVerticalConstraints];
@@ -102,11 +102,11 @@
 }
 
 - (void)buttonPressed:(UIButton*)button {
-    [self toggleFAB];
+    [self toggleFAB:!_expanded];
 }
 
-- (void)toggleFAB {
-    _expanded = !_expanded;
+- (void)toggleFAB:(BOOL)toggled {
+    _expanded = toggled;
     
     if (_expanded) {
         
@@ -124,11 +124,11 @@
         
     }
     
-    __weak typeof(self) weakself = self;
+    // make changes with animations
     CGFloat alpha = _expanded ? 1.0 : 0.0;
-    UIColor* backgroundColor = _expanded ? [[UIColor lightGrayColor] colorWithAlphaComponent:0.5] : [UIColor clearColor];
-
-    [UIView animateWithDuration:0.09 animations:^{
+    UIColor* backgroundColor = _expanded ? [[UIColor whiteColor] colorWithAlphaComponent:0.6] : [UIColor clearColor];
+    __weak typeof(self) weakself = self;
+    [UIView animateWithDuration:0.2 animations:^{
         typeof(self) strongself = weakself;
         if (strongself) {
             [strongself.superview setNeedsLayout];
@@ -146,7 +146,21 @@
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
-    if (_expanded || CGRectContainsPoint(_baseFABItem.buttonFrame, point)) {
+    
+    // opening action
+    if (CGRectContainsPoint(_baseFABItem.buttonFrame, point) && !_expanded) {
+        return YES;
+    }
+    
+    // always close after tap when expanded
+    if (_expanded) {
+        __weak typeof(self) weakself = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            typeof(self) strongself = weakself;
+            if (strongself) {
+                [self toggleFAB:NO];
+            }
+        });
         return YES;
     }
     return NO;

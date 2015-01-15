@@ -20,7 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    DHKFABItem* item1 = [[DHKFABItem alloc] initWithTitle:@"Title 1" icon:nil andAction:^{
+    DHKFABItem* item1 = [[DHKFABItem alloc] initWithTitle:@"Title 1 asdkljfsdf akdf asdkfjhf hiuiufh iuhiawefhu wiuf haifuh  huf test kjhsdf test df fhjsdf hjdhf jhjdf lasdfl huiasdfh k" icon:nil andAction:^{
         NSLog(@"item 1 pressed");
     }];
     DHKFABItem* item2 = [[DHKFABItem alloc] initWithTitle:@"Title 2" icon:nil andAction:^{
@@ -33,6 +33,9 @@
         NSLog(@"item 4 pressed");
     }];
     _fab = [DHKFABView dhk_FABWithSuperview:self.view andItems:@[item1, item2, item3, item4]];
+    
+    
+    self.view.backgroundColor = [UIColor blackColor];
 }
 
 

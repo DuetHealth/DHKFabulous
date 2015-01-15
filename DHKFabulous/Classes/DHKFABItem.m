@@ -9,6 +9,7 @@
 #import "DHKFABItem.h"
 #import "DHKFABLabel.h"
 #import "DHKFABButton.h"
+#import "DHKFABView.h"
 
 @interface DHKFABItem()
 
@@ -60,38 +61,45 @@
     return self;
 }
 
+- (void)setLabelHidden:(BOOL)hidden {
+    _label.hidden = hidden;
+}
+
 - (void)setup {
     self.alpha = 0.0;
-    
-    _button.translatesAutoresizingMaskIntoConstraints = NO;
-    _label.translatesAutoresizingMaskIntoConstraints = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self addSubview:_button];
     [self addSubview:_label];
     
-    [_button addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    // selectors for actions
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionDetected:)];
+    [_label addGestureRecognizer:singleTap];
+    [_button addTarget:self action:@selector(actionDetected:) forControlEvents:UIControlEventTouchUpInside];
     
     // setup constraints
     // lots of constraints
     NSDictionary* metrics = @{@"padding": @16,
                               @"spacing": @5,
                               @"square": @56,
-                              @"height": @72,
+                              @"labelHeight": @22,
                               };
     NSDictionary* views = NSDictionaryOfVariableBindings(_label, _button);
     
     NSArray* buttonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(padding)-[_button(square)]-(padding)-|" options:0 metrics:metrics views:views];
-    NSArray* labelVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(padding)-[_label]-(padding)-|" options:0 metrics:metrics views:views];
-    NSArray* horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[_label(>=50)]-(spacing)-[_button(square)]-(padding)-|" options:0 metrics:metrics views:views];
+    NSArray* labelVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_label]" options:0 metrics:metrics views:views];
+    NSArray* horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=5)-[_label]-(padding)-[_button(square)]-(padding)-|" options:0 metrics:metrics views:views];
     
+    NSLayoutConstraint *verticalCenterLabel = [NSLayoutConstraint constraintWithItem:_label attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0];
+    
+    [self addConstraint:verticalCenterLabel];
     [self addConstraints:buttonVerticalConstraints];
     [self addConstraints:labelVerticalConstraints];
     [self addConstraints:horizontalConstraints];
     
 }
 
-- (void)buttonPressed:(UIButton*)button {
+- (void)actionDetected:(id)sender {
     _action();
 }
 
