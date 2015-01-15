@@ -17,6 +17,9 @@
 @property (strong, nonatomic) DHKFABLabel* label;
 @property (strong, nonatomic) DHKFABButton* button;
 
+@property (strong, nonatomic) NSLayoutConstraint* buttonWidthConstraint;
+@property (strong, nonatomic) NSLayoutConstraint* buttonHeightConstraint;
+
 @end
 
 @implementation DHKFABItem
@@ -65,6 +68,28 @@
     _label.hidden = hidden;
 }
 
+- (void)animateHidden:(BOOL)hidden withDelay:(NSTimeInterval)delay {
+    CGFloat newButtonSquare = hidden ? 0 : 56.0;
+    CGFloat alpha = hidden ? 0.0 : 1.0;
+    __weak typeof(self) weakself = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        typeof(self) strongself = weakself;
+        if (strongself) {
+            __weak typeof(self) weakself = self;
+            [UIView animateWithDuration:0.2 animations:^{
+                typeof(self) strongself = weakself;
+                if (strongself) {
+                    //self.buttonHeightConstraint.constant = newButtonSquare;
+                    //self.buttonWidthConstraint.constant = newButtonSquare;
+                    self.alpha = alpha;
+                }
+            }];
+        }
+    });
+}
+
+#pragma mark - private methods
+
 - (void)setup {
     self.alpha = 0.0;
     self.translatesAutoresizingMaskIntoConstraints = NO;
@@ -86,9 +111,11 @@
                               };
     NSDictionary* views = NSDictionaryOfVariableBindings(_label, _button);
     
-    NSArray* buttonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(padding)-[_button(square)]-(padding)-|" options:0 metrics:metrics views:views];
+    NSArray* buttonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(padding)-[_button]-(padding)-|" options:0 metrics:metrics views:views];
     NSArray* labelVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_label]" options:0 metrics:metrics views:views];
-    NSArray* horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=5)-[_label]-(padding)-[_button(square)]-(padding)-|" options:0 metrics:metrics views:views];
+    NSArray* horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=5)-[_label]-(padding)-[_button]-(padding)-|" options:0 metrics:metrics views:views];
+    
+
     
     NSLayoutConstraint *verticalCenterLabel = [NSLayoutConstraint constraintWithItem:_label attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0];
     
@@ -97,6 +124,12 @@
     [self addConstraints:labelVerticalConstraints];
     [self addConstraints:horizontalConstraints];
     
+    // custom button constraints
+    _buttonWidthConstraint = [NSLayoutConstraint constraintWithItem:_button attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:56.0];
+    _buttonHeightConstraint = [NSLayoutConstraint constraintWithItem:_button attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:56.0];
+    
+    [_button addConstraint:_buttonWidthConstraint];
+    [_button addConstraint:_buttonHeightConstraint];
 }
 
 - (void)actionDetected:(id)sender {

@@ -117,7 +117,6 @@
         }
         [self.superview addConstraint:_topConstraint];
         
-
     } else {
         [self.superview removeConstraint:_topConstraint];
         [self addConstraint:_heightConstraint];
@@ -125,10 +124,12 @@
     }
     
     // make changes with animations
-    CGFloat alpha = _expanded ? 1.0 : 0.0;
-    UIColor* backgroundColor = _expanded ? [[UIColor whiteColor] colorWithAlphaComponent:0.6] : [UIColor clearColor];
+    UIColor* backgroundColor = _expanded ? [[UIColor whiteColor] colorWithAlphaComponent:0.7] : [UIColor clearColor];
+    NSArray *items = self.expanded ? self.items : [[self.items reverseObjectEnumerator] allObjects];
+
+    // animate fab view
     __weak typeof(self) weakself = self;
-    [UIView animateWithDuration:0.2 animations:^{
+    [UIView animateWithDuration:0.15 animations:^{
         typeof(self) strongself = weakself;
         if (strongself) {
             [strongself.superview setNeedsLayout];
@@ -136,13 +137,16 @@
             [strongself setNeedsLayout];
             [strongself layoutIfNeeded];
             
-            for (DHKFABItem* i in strongself.items) {
-                i.alpha = alpha;
-            }
-            
             strongself.backgroundColor = backgroundColor;
         }
     }];
+    
+    // animate fab items
+    NSTimeInterval delay = 0.0;
+    for (DHKFABItem* i in items) {
+        [i animateHidden:!self.expanded withDelay:delay];
+        delay += 0.03;
+    }
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {

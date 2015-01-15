@@ -25,6 +25,8 @@
 
 - (void)setLabelHidden:(BOOL)hidden;
 
+- (void)animateHidden:(BOOL)hidden withDelay:(NSTimeInterval)delay;
+
 
 
 @end
