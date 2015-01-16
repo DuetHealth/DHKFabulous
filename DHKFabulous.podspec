@@ -9,5 +9,5 @@ Pod::Spec.new do |s|
   s.source_files  = 'DHKFabulous/Classes/**'
   s.requires_arc  = true
   s.ios.deployment_target = '7.0'
-  s.dependency 'ReactiveCocoa', '2.3'
+  s.dependency 'ReactiveCocoa', '2.4'
 end
