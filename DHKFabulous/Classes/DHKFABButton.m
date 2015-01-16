@@ -17,7 +17,6 @@
     }
     
     self.translatesAutoresizingMaskIntoConstraints = NO;
-    self.backgroundColor = [UIColor blueColor];
     
     return self;
 }

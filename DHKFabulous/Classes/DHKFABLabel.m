@@ -16,7 +16,6 @@
     
     self.translatesAutoresizingMaskIntoConstraints = NO;
     self.textAlignment = NSTextAlignmentCenter;
-    self.backgroundColor = [UIColor whiteColor];
     self.numberOfLines = 2;
     self.userInteractionEnabled = YES;
     
@@ -36,6 +35,10 @@
     self.layer.cornerRadius = 2.0;
     
     [super drawRect:rect];
+}
+
+- (void)setBackgroundTextColor:(UIColor *)color {
+    self.backgroundColor = color;
 }
 
 @end

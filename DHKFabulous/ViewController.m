@@ -19,6 +19,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor blackColor];
+
+    DHKFABButton.appearance.backgroundColor = [UIColor redColor];
+    [DHKFABLabel.appearance setBackgroundTextColor:[UIColor purpleColor]];
     
     DHKFABItem* item1 = [[DHKFABItem alloc] initWithTitle:@"Title 1 asdkljfsdf akdf asdkfjhf hiuiufh iuhiawefhu wiuf haifuh  huf test kjhsdf test df fhjsdf hjdhf jhjdf lasdfl huiasdfh k" icon:nil andAction:^{
         NSLog(@"item 1 pressed");
@@ -35,11 +39,6 @@
     
     _fab = [DHKFABView dhk_FABWithViewController:self andItems:@[item1, item2, item3, item4]];
     _fab.bottomPadding = 64.0;
-    
-    
-    
-    self.view.backgroundColor = [UIColor blackColor];
 }
-
 
 @end
