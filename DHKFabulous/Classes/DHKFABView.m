@@ -9,6 +9,7 @@
 #import "DHKFABView.h"
 #import "DHKFABButton.h"
 #import "DHKFABItem.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
 
 @interface DHKFABView()
 
@@ -22,6 +23,28 @@
 @end
 
 @implementation DHKFABView
+
++ (instancetype)dhk_FABWithViewController:(UIViewController*)vc andItems:(NSArray*)items {
+    DHKFABView *fab = [[DHKFABView alloc] init];
+    fab.items = items;
+    
+    if (vc.navigationController) {
+        [vc.navigationController.view addSubview:fab];
+    } else {
+        [vc.view addSubview:fab];
+    }
+    
+    [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
+        fab.hidden = NO;
+    }];
+    [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
+        fab.hidden = YES;
+    }];
+    
+    [fab setup];
+    
+    return fab;
+}
 
 + (instancetype)dhk_FABWithSuperview:(UIView*)view andItems:(NSArray*)items {
     
@@ -38,13 +61,11 @@
     self.translatesAutoresizingMaskIntoConstraints = NO;
     
     self.backgroundColor = [UIColor clearColor];
-    
-    __weak typeof(self) weakself = self;
+
+    @weakify(self)
     _baseFABItem = [[DHKFABItem alloc] initWithTitle:nil icon:nil andAction:^{
-        typeof(self) strongself = weakself;
-        if (strongself) {
-            [strongself toggleFAB:!strongself.expanded];
-        }
+        @strongify(self)
+        [self toggleFAB:!self.expanded];
     }];
     [_baseFABItem setLabelHidden:YES];
     
@@ -128,17 +149,15 @@
     NSArray *items = self.expanded ? self.items : [[self.items reverseObjectEnumerator] allObjects];
 
     // animate fab view
-    __weak typeof(self) weakself = self;
+    @weakify(self)
     [UIView animateWithDuration:0.3 animations:^{
-        typeof(self) strongself = weakself;
-        if (strongself) {
-            [strongself.superview setNeedsLayout];
-            [strongself.superview layoutIfNeeded];
-            [strongself setNeedsLayout];
-            [strongself layoutIfNeeded];
+        @strongify(self)
+        [self.superview setNeedsLayout];
+        [self.superview layoutIfNeeded];
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
             
-            strongself.backgroundColor = backgroundColor;
-        }
+        self.backgroundColor = backgroundColor;
     }];
     
     // animate fab items
@@ -150,7 +169,6 @@
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
-    
     // opening action
     if (CGRectContainsPoint(_baseFABItem.buttonFrame, point) && !_expanded) {
         return YES;
@@ -158,12 +176,10 @@
     
     // always close after tap when expanded
     if (_expanded) {
-        __weak typeof(self) weakself = self;
+        @weakify(self)
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            typeof(self) strongself = weakself;
-            if (strongself) {
-                [self toggleFAB:NO];
-            }
+            @strongify(self)
+            [self toggleFAB:NO];
         });
         return YES;
     }

@@ -10,6 +10,7 @@
 
 @interface DHKFABView : UIView
 
++ (instancetype)dhk_FABWithViewController:(UIViewController*)vc andItems:(NSArray*)items;
 + (instancetype)dhk_FABWithSuperview:(UIView*)view andItems:(NSArray*)items;
 - (void)toggleFAB:(BOOL)toggled;
 

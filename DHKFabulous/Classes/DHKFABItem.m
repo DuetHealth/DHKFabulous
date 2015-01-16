@@ -10,6 +10,7 @@
 #import "DHKFABLabel.h"
 #import "DHKFABButton.h"
 #import "DHKFABView.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
 
 @interface DHKFABItem()
 
@@ -70,18 +71,14 @@
 
 - (void)animateHidden:(BOOL)hidden withDelay:(NSTimeInterval)delay {
     CGFloat alpha = hidden ? 0.0 : 1.0;
-    __weak typeof(self) weakself = self;
+    @weakify(self)
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        typeof(self) strongself = weakself;
-        if (strongself) {
-            __weak typeof(self) weakself = strongself;
-            [UIView animateWithDuration:0.3 animations:^{
-                typeof(self) strongself = weakself;
-                if (strongself) {
-                    strongself.alpha = alpha;
-                }
-            }];
-        }
+        @strongify(self)
+        @weakify(self)
+        [UIView animateWithDuration:0.3 animations:^{
+            @strongify(self)
+            self.alpha = alpha;
+        }];
     });
 }
 
