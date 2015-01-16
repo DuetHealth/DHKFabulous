@@ -10,6 +10,7 @@
 
 @interface DHKFABLabel : UILabel
 
-- (void)setBackgroundTextColor:(UIColor *)backgroundColor UI_APPEARANCE_SELECTOR;
+- (void)fab_setBackgroundColor:(UIColor *)backgroundColor UI_APPEARANCE_SELECTOR;
+- (void)fab_setTextcolor:(UIColor*)textColor UI_APPEARANCE_SELECTOR;
 
 @end

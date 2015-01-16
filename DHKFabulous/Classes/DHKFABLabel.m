@@ -37,8 +37,12 @@
     [super drawRect:rect];
 }
 
-- (void)setBackgroundTextColor:(UIColor *)color {
-    self.backgroundColor = color;
+- (void)fab_setBackgroundColor:(UIColor *)backgroundColor {
+    self.backgroundColor = backgroundColor;
+}
+
+- (void)fab_setTextcolor:(UIColor*)textColor {
+    self.textColor = textColor;
 }
 
 @end

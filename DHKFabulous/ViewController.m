@@ -22,7 +22,8 @@
     self.view.backgroundColor = [UIColor blackColor];
 
     DHKFABButton.appearance.backgroundColor = [UIColor redColor];
-    [DHKFABLabel.appearance setBackgroundTextColor:[UIColor purpleColor]];
+    [DHKFABLabel.appearance fab_setBackgroundColor:[UIColor purpleColor]];
+    [DHKFABLabel.appearance fab_setTextcolor:[UIColor yellowColor]];
     
     DHKFABItem* item1 = [[DHKFABItem alloc] initWithTitle:@"Title 1 asdkljfsdf akdf asdkfjhf hiuiufh iuhiawefhu wiuf haifuh  huf test kjhsdf test df fhjsdf hjdhf jhjdf lasdfl huiasdfh k" icon:nil andAction:^{
         NSLog(@"item 1 pressed");
