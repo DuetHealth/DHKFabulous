@@ -129,7 +129,7 @@
 
     // animate fab view
     __weak typeof(self) weakself = self;
-    [UIView animateWithDuration:0.15 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         typeof(self) strongself = weakself;
         if (strongself) {
             [strongself.superview setNeedsLayout];
