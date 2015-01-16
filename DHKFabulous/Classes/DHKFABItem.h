@@ -13,6 +13,8 @@
 
 @interface DHKFABItem : UIView
 
+@property (strong, nonatomic) NSLayoutConstraint* bottomPaddingConstraint;
+
 - (instancetype)initWithAttributedTitle:(NSAttributedString*)title
                                    icon:(UIImage*)icon
                               andAction:(void (^)())action;
@@ -22,11 +24,7 @@
                     andAction:(void (^)())action;
 
 - (CGRect)buttonFrame;
-
 - (void)setLabelHidden:(BOOL)hidden;
-
 - (void)animateHidden:(BOOL)hidden withDelay:(NSTimeInterval)delay;
-
-
 
 @end

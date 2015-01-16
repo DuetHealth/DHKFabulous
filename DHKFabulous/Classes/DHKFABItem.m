@@ -97,7 +97,6 @@
     [_button addTarget:self action:@selector(actionDetected:) forControlEvents:UIControlEventTouchUpInside];
     
     // setup constraints
-    // lots of constraints
     NSDictionary* metrics = @{@"padding": @16,
                               @"spacing": @5,
                               @"square": @56,
@@ -105,17 +104,13 @@
                               };
     NSDictionary* views = NSDictionaryOfVariableBindings(_label, _button);
     
-    NSArray* buttonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(padding)-[_button]-(padding)-|" options:0 metrics:metrics views:views];
-    NSArray* labelVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_label]" options:0 metrics:metrics views:views];
+    NSArray* buttonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(padding)-[_button]-(>=padding)-|" options:0 metrics:metrics views:views];
     NSArray* horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=5)-[_label]-(padding)-[_button]-(padding)-|" options:0 metrics:metrics views:views];
-    
-
     
     NSLayoutConstraint *verticalCenterLabel = [NSLayoutConstraint constraintWithItem:_label attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0];
     
     [self addConstraint:verticalCenterLabel];
     [self addConstraints:buttonVerticalConstraints];
-    [self addConstraints:labelVerticalConstraints];
     [self addConstraints:horizontalConstraints];
     
     // custom button constraints

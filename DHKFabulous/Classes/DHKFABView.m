@@ -18,6 +18,8 @@
 @property (strong, nonatomic) NSLayoutConstraint* heightConstraint;
 @property (strong, nonatomic) NSLayoutConstraint* topConstraint;
 
+// this gets edited when adding padding
+@property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
 @property (assign, nonatomic) BOOL expanded;
 
 @end
@@ -46,15 +48,14 @@
     return fab;
 }
 
-+ (instancetype)dhk_FABWithSuperview:(UIView*)view andItems:(NSArray*)items {
+- (void)setBottomPadding:(CGFloat)bottomPadding {
+    _bottomPadding = bottomPadding;
     
-    DHKFABView *fab = [[DHKFABView alloc] init];
-    fab.items = items;
-    [view addSubview:fab];
-    
-    [fab setup];
-    
-    return fab;
+    //_baseFABItem.bottomPaddingConstraint.constant = -1.0 * bottomPadding - 16.0;
+    @synchronized (self) {
+    _baseItemHeightConstraint.constant += bottomPadding;
+    _heightConstraint.constant += bottomPadding;
+    }
 }
 
 - (void)setup {
@@ -85,6 +86,10 @@
     [self addConstraints:itemVerticalConstraints];
     [self addConstraints:itemHorizontalConstraints];
     
+    _baseItemHeightConstraint = [NSLayoutConstraint constraintWithItem:_baseFABItem attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:88.0];
+    [_baseFABItem addConstraint:_baseItemHeightConstraint];
+    
+    
     // my constraints
     NSArray *fabVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[self]|" options:0 metrics:metrics views:views];
     NSArray *fabHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self]|" options:0 metrics:metrics views:views];
@@ -93,6 +98,7 @@
     [self.superview addConstraints:fabHorizontalConstraints];
     
     _heightConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:88.0];
+    _heightConstraint.priority = 999.0;
     [self addConstraint:_heightConstraint];
     
     [self setupFABItems];
@@ -106,7 +112,7 @@
         
         // constrains for base fab item
         NSDictionary* metrics = @{@"padding": @16,
-                                  @"spacing": @(-10),
+                                  @"spacing": @0,
                                   @"square": @56,
                                   @"height": @88,
                                   };
