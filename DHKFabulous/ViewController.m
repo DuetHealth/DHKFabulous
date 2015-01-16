@@ -32,7 +32,8 @@
     DHKFABItem* item4 = [[DHKFABItem alloc] initWithTitle:@"Title 4" icon:nil andAction:^{
         NSLog(@"item 4 pressed");
     }];
-    _fab = [DHKFABView dhk_FABWithSuperview:self.view andItems:@[item1, item2, item3, item4]];
+    
+    _fab = [DHKFABView dhk_FABWithViewController:self andItems:@[item1, item2, item3, item4]];
     
     
     self.view.backgroundColor = [UIColor blackColor];

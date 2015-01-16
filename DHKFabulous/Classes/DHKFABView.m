@@ -37,7 +37,7 @@
     [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
         fab.hidden = NO;
     }];
-    [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
+    [[vc rac_signalForSelector:@selector(viewWillDisappear:)] subscribeNext:^(id x) {
         fab.hidden = YES;
     }];
     
