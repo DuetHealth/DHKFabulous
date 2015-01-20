@@ -17,6 +17,9 @@
     if (self == nil) {
         return nil;
     }
+    
+    [self.titleLabel setFont:[UIFont systemFontOfSize:35.0]];
+    self.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 5, 0);
    
     self.translatesAutoresizingMaskIntoConstraints = NO;
     

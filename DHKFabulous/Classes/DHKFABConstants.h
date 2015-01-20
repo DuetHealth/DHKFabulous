@@ -10,6 +10,6 @@
 #define DHKFabulous_DHKFABConstants_h
 
 static CGFloat fabAnimationDuration = 0.3;
-static CGFloat fabItemHeight = 58.0;
+static CGFloat fabItemHeight = 56.0;
 
 #endif

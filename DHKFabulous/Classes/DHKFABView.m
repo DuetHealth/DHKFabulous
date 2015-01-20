@@ -30,6 +30,7 @@ typedef enum {
 @property (strong, nonatomic) NSLayoutConstraint* heightConstraint;
 @property (strong, nonatomic) NSLayoutConstraint* topConstraint;
 @property (assign, nonatomic) DHKFABVisualState visualState;
+@property (strong, nonatomic) UILabel* toggleLabel;
 
 // this gets edited when adding padding
 @property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
@@ -82,6 +83,13 @@ typedef enum {
     
     _baseFABItem.alpha = 1.0;
     [self addSubview:_baseFABItem];
+    
+    _toggleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, -2, fabItemHeight, fabItemHeight)];
+    _toggleLabel.text = @"+";
+    _toggleLabel.font = [UIFont systemFontOfSize:30];
+    _toggleLabel.textColor = [UIColor whiteColor];
+    _toggleLabel.textAlignment = NSTextAlignmentCenter;
+    [_baseFABItem.button addSubview:_toggleLabel];
     
     // constrains for base fab item
     NSDictionary* metrics = @{@"padding": @16,
@@ -195,6 +203,20 @@ typedef enum {
         [self layoutIfNeeded];
             
         self.backgroundColor = backgroundColor;
+        
+        CGFloat a = M_PI_4;
+        CGFloat x = 2.0;
+        CGFloat y = 3.0;
+        
+        CGAffineTransform transform = CGAffineTransformMakeTranslation(x, y);
+        transform = CGAffineTransformRotate(transform, a);
+        transform = CGAffineTransformTranslate(transform,-x,-y);
+        
+        if (!movingToExpanded) {
+            transform = CGAffineTransformIdentity;
+        }
+        
+        self.toggleLabel.transform = transform;
     }];
     
     // animate fab items
