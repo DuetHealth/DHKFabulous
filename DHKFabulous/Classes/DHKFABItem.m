@@ -16,10 +16,9 @@
 
 @property (copy, nonatomic) void (^action)();
 @property (strong, nonatomic) DHKFABLabel* label;
-@property (strong, nonatomic) DHKFABButton* button;
-
 @property (strong, nonatomic) NSLayoutConstraint* buttonWidthConstraint;
 @property (strong, nonatomic) NSLayoutConstraint* buttonHeightConstraint;
+@property (strong, nonatomic) RACSubject* actionSubject;
 
 @end
 
@@ -85,6 +84,8 @@
 #pragma mark - private methods
 
 - (void)setup {
+    _actionSubject = [RACSubject subject];
+    
     self.alpha = 0.0;
     self.translatesAutoresizingMaskIntoConstraints = NO;
     
@@ -123,10 +124,15 @@
 
 - (void)actionDetected:(id)sender {
     _action();
+    [_actionSubject sendNext:self];
 }
 
 - (CGRect)buttonFrame {
     return _button.frame;
+}
+
+- (RACSignal*)actionSignal {
+    return [_actionSubject takeUntil:nil];
 }
 
 @end

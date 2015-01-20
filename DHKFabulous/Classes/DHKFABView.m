@@ -9,18 +9,31 @@
 #import "DHKFABView.h"
 #import "DHKFABButton.h"
 #import "DHKFABItem.h"
+#import "DHKFABConstants.h"
 #import <ReactiveCocoa/ReactiveCocoa.h>
 
+@interface DHKFABItem (DHKFABReactive)
+- (RACSignal*)actionSignal;
+@end
+
 @interface DHKFABView()
+
+typedef enum {
+    FAB_STATE_EXPANDED,
+    FAB_STATE_EXPANDING,
+    FAB_STATE_COLLAPSED,
+    FAB_STATE_COLLAPSING
+} DHKFABVisualState;
 
 @property (strong, nonatomic) DHKFABItem* baseFABItem;
 @property (strong, nonatomic) NSArray* items;
 @property (strong, nonatomic) NSLayoutConstraint* heightConstraint;
 @property (strong, nonatomic) NSLayoutConstraint* topConstraint;
+@property (assign, nonatomic) DHKFABVisualState visualState;
 
 // this gets edited when adding padding
 @property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
-@property (assign, nonatomic) BOOL expanded;
+
 
 @end
 
@@ -51,22 +64,19 @@
 - (void)setBottomPadding:(CGFloat)bottomPadding {
     _bottomPadding = bottomPadding;
     
-    //_baseFABItem.bottomPaddingConstraint.constant = -1.0 * bottomPadding - 16.0;
-    @synchronized (self) {
     _baseItemHeightConstraint.constant += bottomPadding;
     _heightConstraint.constant += bottomPadding;
-    }
 }
 
 - (void)setup {
     self.translatesAutoresizingMaskIntoConstraints = NO;
-    
     self.backgroundColor = [UIColor clearColor];
+    _visualState = FAB_STATE_COLLAPSED;
 
     @weakify(self)
     _baseFABItem = [[DHKFABItem alloc] initWithTitle:nil icon:nil andAction:^{
         @strongify(self)
-        [self toggleFAB:!self.expanded];
+        [self toggleFAB];
     }];
     [_baseFABItem setLabelHidden:YES];
     
@@ -124,18 +134,38 @@
         [self addConstraints:itemVerticalConstraints];
         [self addConstraints:itemHorizontalConstraints];
         
+        // action for button
+        @weakify(self)
+        [i.actionSignal subscribeNext:^(DHKFABItem* i) {
+            @strongify(self)
+            [self toggleFAB];
+        }];
+        
         previousItem = i;
     }
 }
 
-- (void)buttonPressed:(UIButton*)button {
-    [self toggleFAB:!_expanded];
+- (void)toggleFAB {
+    switch (_visualState) {
+        case FAB_STATE_COLLAPSED:
+            [self p_toggleFAB:YES];
+            break;
+        case FAB_STATE_EXPANDED:
+            [self p_toggleFAB:NO];
+            break;
+            
+        default:
+            // do nothing when in the collapsing or expanding states
+            break;
+    }
 }
 
-- (void)toggleFAB:(BOOL)toggled {
-    _expanded = toggled;
+- (void)p_toggleFAB:(BOOL)toggled {
     
-    if (_expanded) {
+    BOOL movingToExpanded = _visualState == FAB_STATE_COLLAPSED;
+    
+    if (movingToExpanded) {
+        _visualState = FAB_STATE_EXPANDING;
         
         [self removeConstraint:_heightConstraint];
         
@@ -145,18 +175,19 @@
         [self.superview addConstraint:_topConstraint];
         
     } else {
+        _visualState = FAB_STATE_COLLAPSING;
+        
         [self.superview removeConstraint:_topConstraint];
         [self addConstraint:_heightConstraint];
-        
     }
     
     // make changes with animations
-    UIColor* backgroundColor = _expanded ? [[UIColor whiteColor] colorWithAlphaComponent:0.7] : [UIColor clearColor];
-    NSArray *items = self.expanded ? self.items : [[self.items reverseObjectEnumerator] allObjects];
+    UIColor* backgroundColor = movingToExpanded ? [[UIColor whiteColor] colorWithAlphaComponent:0.7] : [UIColor clearColor];
+    NSArray *items = movingToExpanded ? self.items : [[self.items reverseObjectEnumerator] allObjects];
 
     // animate fab view
     @weakify(self)
-    [UIView animateWithDuration:0.3 animations:^{
+    [UIView animateWithDuration:fabAnimationDuration animations:^{
         @strongify(self)
         [self.superview setNeedsLayout];
         [self.superview layoutIfNeeded];
@@ -169,27 +200,41 @@
     // animate fab items
     NSTimeInterval delay = 0.0;
     for (DHKFABItem* i in items) {
-        [i animateHidden:!self.expanded withDelay:delay];
-        delay += 0.03;
+        [i animateHidden:!movingToExpanded withDelay:delay];
+        delay += fabAnimationDuration / items.count;
     }
+    
+    // reset state after animations are complete
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(fabAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        @strongify(self)
+        self.visualState = movingToExpanded ? FAB_STATE_EXPANDED : FAB_STATE_COLLAPSED;
+    });
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+    
+    [self toggleFAB];
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
-    // opening action
-    if (CGRectContainsPoint(_baseFABItem.buttonFrame, point) && !_expanded) {
-        return YES;
+    switch (_visualState) {
+        case FAB_STATE_COLLAPSED: {
+            if (CGRectContainsPoint(_baseFABItem.button.frame, point)) {
+                return YES;
+            }
+            return NO;
+        }
+        
+        case FAB_STATE_EXPANDED: {
+
+            return YES;
+        }
+        default: {
+            return NO;
+        }
     }
-    
-    // always close after tap when expanded
-    if (_expanded) {
-        @weakify(self)
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            @strongify(self)
-            [self toggleFAB:NO];
-        });
-        return YES;
-    }
-    return NO;
 }
 
 @end
+

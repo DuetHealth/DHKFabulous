@@ -7,6 +7,7 @@
 //
 
 #import "DHKFABLabel.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation DHKFABLabel
 

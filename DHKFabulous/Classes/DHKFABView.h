@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DHKFABView : UIView
+@interface DHKFABView : UIControl
 
 @property (assign, nonatomic) CGFloat bottomPadding;
 
 + (instancetype)dhk_FABWithViewController:(UIViewController*)vc andItems:(NSArray*)items;
-- (void)toggleFAB:(BOOL)toggled;
+- (void)toggleFAB;
 
 
 @end

@@ -10,10 +10,13 @@
 #import <UIKit/UIKit.h>
 
 @class DHKFABView;
+@class DHKFABButton;
+@class DHKFABView;
 
 @interface DHKFABItem : UIView
 
-@property (strong, nonatomic) NSLayoutConstraint* bottomPaddingConstraint;
+@property (strong, nonatomic, readonly) NSLayoutConstraint* bottomPaddingConstraint;
+@property (strong, nonatomic, readonly) DHKFABButton* button;
 
 - (instancetype)initWithAttributedTitle:(NSAttributedString*)title
                                    icon:(UIImage*)icon
@@ -23,7 +26,6 @@
                          icon:(UIImage*)icon
                     andAction:(void (^)())action;
 
-- (CGRect)buttonFrame;
 - (void)setLabelHidden:(BOOL)hidden;
 - (void)animateHidden:(BOOL)hidden withDelay:(NSTimeInterval)delay;
 

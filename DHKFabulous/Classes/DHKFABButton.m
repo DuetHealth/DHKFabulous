@@ -7,6 +7,8 @@
 //
 
 #import "DHKFABButton.h"
+#import "DHKFABConstants.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation DHKFABButton
 
@@ -15,17 +17,36 @@
     if (self == nil) {
         return nil;
     }
-    
+   
     self.translatesAutoresizingMaskIntoConstraints = NO;
     
+    self.layer.cornerRadius = fabItemHeight / 2.0;
+    self.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.layer.shadowRadius = 5.0;
+    [self clearHighlightView];
+
     return self;
 }
 
-- (void)drawRect:(CGRect)rect {
-    self.clipsToBounds = YES;
-    self.layer.cornerRadius = self.frame.size.width / 2.0;
+- (void)highlightView
+{
+    self.layer.shadowOffset = CGSizeMake(0.0, 5.0);
+    self.layer.shadowOpacity = 0.5;
+}
 
-    [super drawRect:rect];
+- (void)clearHighlightView {
+    self.layer.shadowOffset = CGSizeMake(0.0, 3.0);
+    self.layer.shadowOpacity = 0.25;
+}
+
+- (void)setHighlighted:(BOOL)highlighted
+{
+    if (highlighted) {
+        [self highlightView];
+    } else {
+        [self clearHighlightView];
+    }
+    [super setHighlighted:highlighted];
 }
 
 @end
