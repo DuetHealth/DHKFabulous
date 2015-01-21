@@ -49,7 +49,6 @@
     } else {
         [self clearHighlightView];
     }
-    [super setHighlighted:highlighted];
 }
 
 @end
