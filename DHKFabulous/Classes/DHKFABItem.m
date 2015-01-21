@@ -34,7 +34,7 @@
     _action = action;
     
     _button = [[DHKFABButton alloc] init];
-    [_button setBackgroundImage:icon forState:UIControlStateNormal];
+    [_button setImage:icon forState:UIControlStateNormal];
     
     _label = [[DHKFABLabel alloc] init];
     _label.attributedText = title;
@@ -54,7 +54,7 @@
     _action = action;
     
     _button = [[DHKFABButton alloc] init];
-    [_button setBackgroundImage:icon forState:UIControlStateNormal];
+    [_button setImage:icon forState:UIControlStateNormal];
     
     _label = [[DHKFABLabel alloc] init];
     _label.text = title;
