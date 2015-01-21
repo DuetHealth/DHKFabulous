@@ -9,7 +9,7 @@
 #ifndef DHKFabulous_DHKFABConstants_h
 #define DHKFabulous_DHKFABConstants_h
 
-static CGFloat fabAnimationDuration = 0.3;
+static CGFloat fabAnimationDuration = 0.2;
 static CGFloat fabItemHeight = 56.0;
 
 #endif
