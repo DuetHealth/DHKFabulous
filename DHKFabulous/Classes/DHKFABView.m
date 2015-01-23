@@ -32,6 +32,9 @@ typedef enum {
 @property (assign, nonatomic) DHKFABVisualState visualState;
 @property (strong, nonatomic) UILabel* toggleLabel;
 
+// for showing and hiding fab on first load
+@property (assign, nonatomic) BOOL hasLoaded;
+
 // this gets edited when adding padding
 @property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
 
@@ -50,16 +53,44 @@ typedef enum {
         [vc.view addSubview:fab];
     }
     
+    @weakify(fab)
     [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
-        fab.hidden = NO;
+        @strongify(fab)
+        if (fab.hasLoaded) {
+            [fab showFAB:NO];
+        } else {
+            [fab showFAB:YES];
+        }
+    }];
+    [[vc rac_signalForSelector:@selector(viewDidAppear:)] subscribeNext:^(id x) {
+        @strongify(fab)
+        [fab showFAB:YES];
+        fab.hasLoaded = YES;
     }];
     [[vc rac_signalForSelector:@selector(viewWillDisappear:)] subscribeNext:^(id x) {
-        fab.hidden = YES;
+        @strongify(fab)
+        [fab showFAB:NO];
     }];
     
     [fab setup];
     
     return fab;
+}
+
+- (void)showFAB:(BOOL)visible {
+    CGFloat newAlpha = visible ? 1.0 : 0.0;
+    CGFloat duration = visible ? 2.0 : 0.0;
+    
+    [self.superview setNeedsLayout];
+    [self.superview layoutIfNeeded];
+    [self setNeedsLayout];
+    [self layoutIfNeeded];
+    
+    @weakify(self)
+    [UIView animateWithDuration:duration animations:^{
+        @strongify(self)
+        self.alpha = newAlpha;
+    }];
 }
 
 - (void)setBottomPadding:(CGFloat)bottomPadding {
@@ -70,6 +101,7 @@ typedef enum {
 }
 
 - (void)setup {
+    self.alpha = 0.0;
     self.translatesAutoresizingMaskIntoConstraints = NO;
     self.backgroundColor = [UIColor clearColor];
     _visualState = FAB_STATE_COLLAPSED;
