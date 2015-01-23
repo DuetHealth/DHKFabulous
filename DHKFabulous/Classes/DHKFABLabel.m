@@ -23,19 +23,15 @@
     [self setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];
     [self setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];
     
+    self.clipsToBounds = YES;
+    self.layer.cornerRadius = 2.0;
+    
     return self;
 }
 
 -(CGSize)intrinsicContentSize {
     CGSize contentSize = [super intrinsicContentSize];
     return CGSizeMake(contentSize.width + 15, contentSize.height + 10);
-}
-
-- (void)drawRect:(CGRect)rect {
-    self.clipsToBounds = YES;
-    self.layer.cornerRadius = 2.0;
-    
-    [super drawRect:rect];
 }
 
 - (void)fab_setBackgroundColor:(UIColor *)backgroundColor {
