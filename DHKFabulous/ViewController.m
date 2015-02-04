@@ -40,6 +40,11 @@
     
     _fab = [DHKFABView dhk_FABWithViewController:self andItems:@[item1, item2, item3, item4]];
     _fab.bottomPadding = 64.0;
+    
+    
+    NSInteger g = 1;
+    NSInteger h = 2;
+    
 }
 
 @end

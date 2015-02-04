@@ -37,6 +37,9 @@ typedef enum {
 
 // this gets edited when adding padding
 @property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
+@property (assign, nonatomic) CGFloat heightConstant;
+@property (strong, nonatomic) NSArray* fabItemSpacingConstraints;
+@property (strong, nonatomic) NSNumber* previousBottomPadding;
 
 
 @end
@@ -46,6 +49,7 @@ typedef enum {
 + (instancetype)dhk_FABWithViewController:(UIViewController*)vc andItems:(NSArray*)items {
     DHKFABView *fab = [[DHKFABView alloc] init];
     fab.items = items;
+    fab.heightConstant = 88.0;
     
     if (vc.navigationController) {
         [vc.navigationController.view addSubview:fab];
@@ -72,6 +76,26 @@ typedef enum {
         [fab showFAB:NO];
     }];
     
+    [[[vc rac_signalForSelector:@selector(traitCollectionDidChange:)] skip:1]  subscribeNext:^(UITraitCollection* previousTraitCollection) {
+        @strongify(fab)
+        
+        CGFloat spacing = 0.0;
+        
+        if (fab.previousBottomPadding != nil) {
+            fab.bottomPadding = fab.previousBottomPadding.floatValue;
+            fab.previousBottomPadding = nil;
+            
+        } else {
+            fab.previousBottomPadding = @(fab.bottomPadding);
+            fab.bottomPadding = 0.0;
+            spacing = 20.0;
+        }
+        
+        for (NSLayoutConstraint* spaceConstraint in fab.fabItemSpacingConstraints) {
+            spaceConstraint.constant = spacing;
+        }
+    }];
+    
     [fab setup];
     
     return fab;
@@ -96,8 +120,8 @@ typedef enum {
 - (void)setBottomPadding:(CGFloat)bottomPadding {
     _bottomPadding = bottomPadding;
     
-    _baseItemHeightConstraint.constant += bottomPadding;
-    _heightConstraint.constant += bottomPadding;
+    _baseItemHeightConstraint.constant = _heightConstant + bottomPadding;
+    _heightConstraint.constant = _heightConstant + bottomPadding;
 }
 
 - (void)setup {
@@ -127,7 +151,7 @@ typedef enum {
     NSDictionary* metrics = @{@"padding": @16,
                               @"spacing": @5,
                               @"square": @56,
-                              @"height": @88,
+                              @"height": @(_heightConstant),
                               };
     NSDictionary* views = NSDictionaryOfVariableBindings(_baseFABItem, self);
     NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_baseFABItem]|" options:0 metrics:metrics views:views];
@@ -136,7 +160,7 @@ typedef enum {
     [self addConstraints:itemVerticalConstraints];
     [self addConstraints:itemHorizontalConstraints];
     
-    _baseItemHeightConstraint = [NSLayoutConstraint constraintWithItem:_baseFABItem attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:88.0];
+    _baseItemHeightConstraint = [NSLayoutConstraint constraintWithItem:_baseFABItem attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_heightConstant];
     [_baseFABItem addConstraint:_baseItemHeightConstraint];
     
     
@@ -147,7 +171,7 @@ typedef enum {
     [self.superview addConstraints:fabVerticalConstraints];
     [self.superview addConstraints:fabHorizontalConstraints];
     
-    _heightConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:88.0];
+    _heightConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_heightConstant];
     _heightConstraint.priority = 999.0;
     [self addConstraint:_heightConstraint];
     
@@ -156,23 +180,27 @@ typedef enum {
 
 // this sets up constraints for fabitems
 - (void)setupFABItems {
+    NSMutableArray* spacingConstraints = [NSMutableArray array];
+    
     DHKFABItem* previousItem = _baseFABItem;
     for (DHKFABItem* i in _items) {
         [self addSubview:i];
         
         // constrains for base fab item
         NSDictionary* metrics = @{@"padding": @16,
-                                  @"spacing": @0,
                                   @"square": @56,
-                                  @"height": @88,
+                                  @"height": @(_heightConstant),
                                   };
         NSDictionary* views = NSDictionaryOfVariableBindings(i, previousItem, self);
         
-        NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[i(height)]-(spacing)-[previousItem]" options:0 metrics:metrics views:views];
+        NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[i(height)]" options:0 metrics:metrics views:views];
+        NSLayoutConstraint* verticalSpacingConstraint = [NSLayoutConstraint constraintWithItem:i attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationLessThanOrEqual toItem:previousItem attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
+        [spacingConstraints addObject:verticalSpacingConstraint];
         NSArray* itemHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[i]|" options:0 metrics:metrics views:views];
         
         [self addConstraints:itemVerticalConstraints];
         [self addConstraints:itemHorizontalConstraints];
+        [self addConstraint:verticalSpacingConstraint];
         
         // action for button
         @weakify(self)
@@ -183,6 +211,8 @@ typedef enum {
         
         previousItem = i;
     }
+    
+    _fabItemSpacingConstraints = spacingConstraints;
 }
 
 - (void)toggleFAB {
