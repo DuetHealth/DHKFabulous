@@ -39,6 +39,9 @@ typedef enum {
 @property (assign, nonatomic) CGFloat previousBottomPadding;
 @property (assign, nonatomic) BOOL isLandscape;
 
+// check for being in navigation controller
+@property (assign, nonatomic) BOOL inNavigationController;
+
 @end
 
 @implementation DHKFABView
@@ -85,7 +88,12 @@ typedef enum {
 }
 
 - (void)setupWithViewController:(UIViewController*)vc {
-    [vc.view addSubview:self];
+    if (vc.navigationController) {
+        [vc.navigationController.view addSubview:self];
+        self.inNavigationController = YES;
+    } else {
+        [vc.view addSubview:self];
+    }
     
     // this is used to ignore bottom padding and spacing if starting vc state is landscape
     if ([vc respondsToSelector:@selector(traitCollection)]) {
@@ -111,12 +119,9 @@ typedef enum {
         [self showFAB:NO];
     }];
     
-    NSUInteger skipFirst = 1;
+    NSUInteger skipFirst = self.inNavigationController ? 1 : 0;
     if (vc.isViewLoaded) {
         [self showFAB:YES];
-        
-        // view has already loaded, no need to skip lifecycle methods
-        skipFirst = 0;
     }
     
     [[[vc rac_signalForSelector:@selector(traitCollectionDidChange:)] skip:skipFirst] subscribeNext:^(RACTuple* tuple) {
@@ -148,7 +153,7 @@ typedef enum {
     self.translatesAutoresizingMaskIntoConstraints = NO;
     self.backgroundColor = [UIColor clearColor];
     _visualState = FAB_STATE_COLLAPSED;
-
+    
     @weakify(self)
     _baseFABItem = [[DHKFABItem alloc] initWithTitle:nil icon:nil andAction:^{
         @strongify(self)
@@ -167,19 +172,22 @@ typedef enum {
     [_baseFABItem.button addSubview:_toggleLabel];
     
     // constrains for base fab item
+    CGFloat bottomDistance = self.inNavigationController ? 64.0 : 0.0;
     NSDictionary* metrics = @{@"padding": @16,
                               @"spacing": @5,
                               @"square": @56,
                               @"height": @(_heightConstant),
+                              @"bottomDistance": @(bottomDistance)
                               };
     NSDictionary* views = NSDictionaryOfVariableBindings(_baseFABItem, self);
     NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_baseFABItem]|" options:0 metrics:metrics views:views];
+    
     NSArray* itemHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_baseFABItem]|" options:0 metrics:metrics views:views];
     
     [self addConstraints:itemVerticalConstraints];
     [self addConstraints:itemHorizontalConstraints];
     
-    _baseItemHeightConstraint = [NSLayoutConstraint constraintWithItem:_baseFABItem attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_heightConstant];
+    _baseItemHeightConstraint = [NSLayoutConstraint constraintWithItem:_baseFABItem attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_heightConstant + bottomDistance];
     [_baseFABItem addConstraint:_baseItemHeightConstraint];
     
     
@@ -277,7 +285,7 @@ typedef enum {
     // make changes with animations
     UIColor* backgroundColor = movingToExpanded ? [[UIColor whiteColor] colorWithAlphaComponent:0.7] : [UIColor clearColor];
     NSArray *items = movingToExpanded ? self.items : [[self.items reverseObjectEnumerator] allObjects];
-
+    
     // animate fab view
     @weakify(self)
     [UIView animateWithDuration:fabAnimationDuration animations:^{
@@ -286,7 +294,7 @@ typedef enum {
         [self.superview layoutIfNeeded];
         [self setNeedsLayout];
         [self layoutIfNeeded];
-            
+        
         self.backgroundColor = backgroundColor;
         
         CGFloat a = M_PI_4;
@@ -332,9 +340,9 @@ typedef enum {
             }
             return NO;
         }
-        
+            
         case FAB_STATE_EXPANDED: {
-
+            
             return YES;
         }
         default: {
