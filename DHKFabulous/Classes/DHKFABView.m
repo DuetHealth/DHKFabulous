@@ -32,9 +32,6 @@ typedef enum {
 @property (assign, nonatomic) DHKFABVisualState visualState;
 @property (strong, nonatomic) UILabel* toggleLabel;
 
-// for showing and hiding fab on first load
-@property (assign, nonatomic) BOOL hasLoaded;
-
 // this gets edited when adding padding
 @property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
 @property (assign, nonatomic) CGFloat heightConstant;
@@ -52,11 +49,6 @@ typedef enum {
     fab.heightConstant = 88.0;
     
     [fab setupWithViewController:vc];
-    
-    if (vc.isViewLoaded) {
-        [fab showFAB:YES];
-        fab.hasLoaded = YES;
-    }
     
     return fab;
 }
@@ -93,32 +85,41 @@ typedef enum {
 }
 
 - (void)setupWithViewController:(UIViewController*)vc {
-    if (vc.navigationController) {
-        [vc.navigationController.view addSubview:self];
-    } else {
-        [vc.view addSubview:self];
+    [vc.view addSubview:self];
+    
+    // this is used to ignore bottom padding and spacing if starting vc state is landscape
+    if ([vc respondsToSelector:@selector(traitCollection)]) {
+        UITraitCollection* currentTraitCollection = vc.traitCollection;
+        if (currentTraitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
+            self.isLandscape = YES;
+        }
     }
+    
+    [self setupConstraints];
     
     @weakify(self)
     [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
         @strongify(self)
-        if (self.hasLoaded) {
-            [self showFAB:NO];
-        } else {
-            [self showFAB:YES];
-        }
+        [self showFAB:YES];
     }];
     [[vc rac_signalForSelector:@selector(viewDidAppear:)] subscribeNext:^(id x) {
         @strongify(self)
         [self showFAB:YES];
-        self.hasLoaded = YES;
     }];
     [[vc rac_signalForSelector:@selector(viewWillDisappear:)] subscribeNext:^(id x) {
         @strongify(self)
         [self showFAB:NO];
     }];
     
-    [[vc rac_signalForSelector:@selector(traitCollectionDidChange:)]  subscribeNext:^(RACTuple* tuple) {
+    NSUInteger skipFirst = 1;
+    if (vc.isViewLoaded) {
+        [self showFAB:YES];
+        
+        // view has already loaded, no need to skip lifecycle methods
+        skipFirst = 0;
+    }
+    
+    [[[vc rac_signalForSelector:@selector(traitCollectionDidChange:)] skip:skipFirst] subscribeNext:^(RACTuple* tuple) {
         @strongify(self)
         
         UITraitCollection* previousTraitCollection = tuple[0];
@@ -140,16 +141,6 @@ typedef enum {
             spaceConstraint.constant = spacing;
         }
     }];
-    
-    // this is used to ignore bottom padding and spacing if starting vc state is landscape
-    if ([vc respondsToSelector:@selector(traitCollection)]) {
-        UITraitCollection* currentTraitCollection = vc.traitCollection;
-        if (currentTraitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
-            self.isLandscape = YES;
-        }
-    }
-    
-    [self setupConstraints];
 }
 
 - (void)setupConstraints {
