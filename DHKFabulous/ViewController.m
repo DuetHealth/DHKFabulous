@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "DHKFabulous.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
 
 @interface ViewController ()
 
@@ -20,7 +21,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor blackColor];
+    
+    @weakify(self)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        @strongify(self)
+        [self doFAB];
+    });
+}
 
+- (void)doFAB {
     DHKFABButton.appearance.backgroundColor = [UIColor redColor];
     [DHKFABLabel.appearance fab_setBackgroundColor:[UIColor purpleColor]];
     [DHKFABLabel.appearance fab_setTextcolor:[UIColor yellowColor]];
@@ -40,11 +49,6 @@
     
     _fab = [DHKFABView dhk_FABWithViewController:self andItems:@[item1, item2, item3, item4]];
     _fab.bottomPadding = 64.0;
-    
-    
-    NSInteger g = 1;
-    NSInteger h = 2;
-    
 }
 
 @end

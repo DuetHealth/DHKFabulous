@@ -39,8 +39,8 @@ typedef enum {
 @property (strong, nonatomic) NSLayoutConstraint* baseItemHeightConstraint;
 @property (assign, nonatomic) CGFloat heightConstant;
 @property (strong, nonatomic) NSArray* fabItemSpacingConstraints;
-@property (strong, nonatomic) NSNumber* previousBottomPadding;
-
+@property (assign, nonatomic) CGFloat previousBottomPadding;
+@property (assign, nonatomic) BOOL isLandscape;
 
 @end
 
@@ -51,52 +51,12 @@ typedef enum {
     fab.items = items;
     fab.heightConstant = 88.0;
     
-    if (vc.navigationController) {
-        [vc.navigationController.view addSubview:fab];
-    } else {
-        [vc.view addSubview:fab];
-    }
+    [fab setupWithViewController:vc];
     
-    @weakify(fab)
-    [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
-        @strongify(fab)
-        if (fab.hasLoaded) {
-            [fab showFAB:NO];
-        } else {
-            [fab showFAB:YES];
-        }
-    }];
-    [[vc rac_signalForSelector:@selector(viewDidAppear:)] subscribeNext:^(id x) {
-        @strongify(fab)
+    if (vc.isViewLoaded) {
         [fab showFAB:YES];
         fab.hasLoaded = YES;
-    }];
-    [[vc rac_signalForSelector:@selector(viewWillDisappear:)] subscribeNext:^(id x) {
-        @strongify(fab)
-        [fab showFAB:NO];
-    }];
-    
-    [[[vc rac_signalForSelector:@selector(traitCollectionDidChange:)] skip:1]  subscribeNext:^(UITraitCollection* previousTraitCollection) {
-        @strongify(fab)
-        
-        CGFloat spacing = 0.0;
-        
-        if (fab.previousBottomPadding != nil) {
-            fab.bottomPadding = fab.previousBottomPadding.floatValue;
-            fab.previousBottomPadding = nil;
-            
-        } else {
-            fab.previousBottomPadding = @(fab.bottomPadding);
-            fab.bottomPadding = 0.0;
-            spacing = 20.0;
-        }
-        
-        for (NSLayoutConstraint* spaceConstraint in fab.fabItemSpacingConstraints) {
-            spaceConstraint.constant = spacing;
-        }
-    }];
-    
-    [fab setup];
+    }
     
     return fab;
 }
@@ -118,13 +78,81 @@ typedef enum {
 }
 
 - (void)setBottomPadding:(CGFloat)bottomPadding {
-    _bottomPadding = bottomPadding;
-    
-    _baseItemHeightConstraint.constant = _heightConstant + bottomPadding;
-    _heightConstraint.constant = _heightConstant + bottomPadding;
+    if (_isLandscape) {
+        // defer bottom padding updates until rotate to portrait
+        _bottomPadding = 0.0;
+        _previousBottomPadding = bottomPadding;
+        _baseItemHeightConstraint.constant = _heightConstant;
+        _heightConstraint.constant = _heightConstant;
+    } else {
+        // immediately set bottom padding
+        _bottomPadding = bottomPadding;
+        _baseItemHeightConstraint.constant = _heightConstant + bottomPadding;
+        _heightConstraint.constant = _heightConstant + bottomPadding;
+    }
 }
 
-- (void)setup {
+- (void)setupWithViewController:(UIViewController*)vc {
+    if (vc.navigationController) {
+        [vc.navigationController.view addSubview:self];
+    } else {
+        [vc.view addSubview:self];
+    }
+    
+    @weakify(self)
+    [[vc rac_signalForSelector:@selector(viewWillAppear:)] subscribeNext:^(id x) {
+        @strongify(self)
+        if (self.hasLoaded) {
+            [self showFAB:NO];
+        } else {
+            [self showFAB:YES];
+        }
+    }];
+    [[vc rac_signalForSelector:@selector(viewDidAppear:)] subscribeNext:^(id x) {
+        @strongify(self)
+        [self showFAB:YES];
+        self.hasLoaded = YES;
+    }];
+    [[vc rac_signalForSelector:@selector(viewWillDisappear:)] subscribeNext:^(id x) {
+        @strongify(self)
+        [self showFAB:NO];
+    }];
+    
+    [[vc rac_signalForSelector:@selector(traitCollectionDidChange:)]  subscribeNext:^(RACTuple* tuple) {
+        @strongify(self)
+        
+        UITraitCollection* previousTraitCollection = tuple[0];
+        CGFloat spacing = 0.0;
+        
+        if (previousTraitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
+            // moving to portrait
+            self.isLandscape = NO;
+            self.bottomPadding = self.previousBottomPadding;
+            
+        } else {
+            // moving to landscape
+            self.previousBottomPadding = self.bottomPadding;
+            self.bottomPadding = 0.0;
+            spacing = 20.0;
+        }
+        
+        for (NSLayoutConstraint* spaceConstraint in self.fabItemSpacingConstraints) {
+            spaceConstraint.constant = spacing;
+        }
+    }];
+    
+    // this is used to ignore bottom padding and spacing if starting vc state is landscape
+    if ([vc respondsToSelector:@selector(traitCollection)]) {
+        UITraitCollection* currentTraitCollection = vc.traitCollection;
+        if (currentTraitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
+            self.isLandscape = YES;
+        }
+    }
+    
+    [self setupConstraints];
+}
+
+- (void)setupConstraints {
     self.alpha = 0.0;
     self.translatesAutoresizingMaskIntoConstraints = NO;
     self.backgroundColor = [UIColor clearColor];
@@ -194,7 +222,11 @@ typedef enum {
         NSDictionary* views = NSDictionaryOfVariableBindings(i, previousItem, self);
         
         NSArray* itemVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[i(height)]" options:0 metrics:metrics views:views];
-        NSLayoutConstraint* verticalSpacingConstraint = [NSLayoutConstraint constraintWithItem:i attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationLessThanOrEqual toItem:previousItem attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
+        CGFloat spacing = 0;
+        if (_isLandscape) {
+            spacing = 20.0;
+        }
+        NSLayoutConstraint* verticalSpacingConstraint = [NSLayoutConstraint constraintWithItem:i attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationLessThanOrEqual toItem:previousItem attribute:NSLayoutAttributeTop multiplier:1.0 constant:spacing];
         [spacingConstraints addObject:verticalSpacingConstraint];
         NSArray* itemHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[i]|" options:0 metrics:metrics views:views];
         
