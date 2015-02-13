@@ -58,7 +58,7 @@ typedef enum {
 
 - (void)showFAB:(BOOL)visible {
     CGFloat newAlpha = visible ? 1.0 : 0.0;
-    CGFloat duration = visible ? 2.0 : 0.0;
+    CGFloat duration = visible ? 0.4 : 0.0;
     
     [self.superview setNeedsLayout];
     [self.superview layoutIfNeeded];
