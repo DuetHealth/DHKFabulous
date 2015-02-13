@@ -58,7 +58,7 @@ typedef enum {
 
 - (void)showFAB:(BOOL)visible {
     CGFloat newAlpha = visible ? 1.0 : 0.0;
-    CGFloat duration = visible ? 0.4 : 0.0;
+    CGFloat duration = visible ? 1.0 : 0.0;
     
     [self.superview setNeedsLayout];
     [self.superview layoutIfNeeded];
@@ -66,10 +66,10 @@ typedef enum {
     [self layoutIfNeeded];
     
     @weakify(self)
-    [UIView animateWithDuration:duration animations:^{
+    [UIView animateKeyframesWithDuration:duration delay:0 options: UIViewKeyframeAnimationOptionAllowUserInteraction animations:^{
         @strongify(self)
         self.alpha = newAlpha;
-    }];
+    } completion:nil];
 }
 
 - (void)setBottomPadding:(CGFloat)bottomPadding {
