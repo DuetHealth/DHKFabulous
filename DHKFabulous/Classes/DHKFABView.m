@@ -56,20 +56,44 @@ typedef enum {
     return fab;
 }
 
-- (void)showFAB:(BOOL)visible {
+- (void)setFabViewState:(DHKFabViewState)fabViewState {
+    if (_fabViewState == fabViewState) { return; }
+
+    _fabViewState = fabViewState;
+    if (_fabViewState == DHKFabViewStateHidden) {
+        [self showFAB:NO animated:YES];
+    } else {
+        [self showFAB:YES animated:YES];
+    }
+}
+
+- (void)showFAB:(BOOL)visible animated:(BOOL)animated {
+    // Ignore showing the fab when hidden
+    if (self.fabViewState == DHKFabViewStateHidden && visible) {
+        return;
+    }
+
     CGFloat newAlpha = visible ? 1.0 : 0.0;
-    CGFloat duration = visible ? 1.0 : 0.0;
-    
+    CGFloat duration = animated ? 1.0 : 0;
+
     [self.superview setNeedsLayout];
     [self.superview layoutIfNeeded];
     [self setNeedsLayout];
     [self layoutIfNeeded];
-    
+
     @weakify(self)
-    [UIView animateKeyframesWithDuration:duration delay:0 options: UIViewKeyframeAnimationOptionAllowUserInteraction animations:^{
+    [UIView animateKeyframesWithDuration:duration delay:0 options:UIViewKeyframeAnimationOptionAllowUserInteraction animations:^{
         @strongify(self)
         self.alpha = newAlpha;
     } completion:nil];
+}
+
+- (void)showFAB:(BOOL)visible {
+    if (visible) {
+        [self showFAB:visible animated:YES];
+    } else {
+        [self showFAB:visible animated:NO];
+    }
 }
 
 - (void)setBottomPadding:(CGFloat)bottomPadding {

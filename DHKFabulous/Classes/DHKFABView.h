@@ -10,10 +10,15 @@
 
 @interface DHKFABView : UIControl
 
+typedef NS_ENUM(NSInteger, DHKFabViewState) {
+    DHKFabViewStateHidden,
+    DHKFabViewStateShowing,
+};
+
 @property (assign, nonatomic) CGFloat bottomPadding;
+@property (assign, nonatomic) DHKFabViewState fabViewState;
 
 + (instancetype)dhk_FABWithViewController:(UIViewController*)vc andItems:(NSArray*)items;
 - (void)toggleFAB;
-- (void)showFAB:(BOOL)visible;
 
 @end
