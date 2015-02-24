@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'DHKFabulous'
-  s.version       = '0.1'
+  s.version       = '1.5.3'
   s.license       = 'MIT'
   s.summary       = 'DHKit Floating Action Button tool.'
   s.homepage      = 'http://gitlab.duethealth.com/groups/ios-projects'

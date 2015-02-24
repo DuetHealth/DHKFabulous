@@ -91,9 +91,6 @@
 		1EF8AEE91A66FD1C0031D1EF = {
 			isa = PBXGroup;
 			children = (
-				1EF8AF2A1A6807980031D1EF /* Foundation.framework */,
-				1EF8AF281A6807800031D1EF /* UIKit.framework */,
-				1EF8AF261A68077C0031D1EF /* QuartzCore.framework */,
 				1EF8AEF41A66FD1C0031D1EF /* DHKFabulous */,
 				1EF8AF0E1A66FD1C0031D1EF /* DHKFabulousTests */,
 				1EF8AEF31A66FD1C0031D1EF /* Products */,
@@ -190,6 +187,9 @@
 		D17799CCC167167801EC12EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1EF8AF2A1A6807980031D1EF /* Foundation.framework */,
+				1EF8AF281A6807800031D1EF /* UIKit.framework */,
+				1EF8AF261A68077C0031D1EF /* QuartzCore.framework */,
 				5027569E75D99C6DD7DB215B /* libPods.a */,
 			);
 			name = Frameworks;

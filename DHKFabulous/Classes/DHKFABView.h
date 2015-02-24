@@ -14,6 +14,6 @@
 
 + (instancetype)dhk_FABWithViewController:(UIViewController*)vc andItems:(NSArray*)items;
 - (void)toggleFAB;
-
+- (void)showFAB:(BOOL)visible;
 
 @end
